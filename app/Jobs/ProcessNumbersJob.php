@@ -2,12 +2,13 @@
 
 namespace App\Jobs;
 
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Bus;
 
 class ProcessNumbersJob implements ShouldQueue
 {
@@ -22,34 +23,13 @@ class ProcessNumbersJob implements ShouldQueue
 
     public function handle()
     {
-        foreach ($this->numbers as $number) {
-            if (is_numeric($number) && floor($number) == $number && $this->isPrime($number)) {
-                Log::channel('prime')->info("{$number}: number found at " . now()->toDateTimeString());
-            }
+        $chunks = array_chunk($this->numbers, 300);
+        $jobs = [];
+
+        foreach ($chunks as $chunk) {
+            $jobs[] = new ProcessNumberChunkJob($chunk);
         }
+
+        Bus::batch($jobs)->dispatch();
     }
-
-    private function isPrime($number): bool
-    {
-        if ($number <= 1) {
-            return false;
-        }
-
-        if ($number == 2) {
-            return true;
-        }
-
-        if ($number % 2 == 0) {
-            return false;
-        }
-
-        for ($i = 3; $i <= sqrt($number); $i += 2) {
-            if ($number % $i == 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-    
 }

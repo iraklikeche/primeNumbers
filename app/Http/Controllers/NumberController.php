@@ -13,7 +13,7 @@ class NumberController extends Controller
 {
   public function submitNumbers(SubmitNumbersRequest $request): JsonResponse
     {
-        ProcessNumbersJob::dispatch($request->validated()['numbers']);
+      ProcessNumbersJob::dispatch($request->validated()['numbers']);
 
         return response()->json(['success' => true]);
 
