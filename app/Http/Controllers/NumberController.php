@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SubmitNumbersRequest;
-use App\Jobs\CheckPrimeJob;
 use App\Jobs\ProcessNumbersJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
